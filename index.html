@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Sumatif Bahasa Inggris - MA Mu'allimin NU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f0fdf4; } /* Light green background for NU theme */
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .hide { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #16a34a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #15803d; }
+        .story-box { background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem; font-style: italic; color: #334155; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Custom Modal for Alerts -->
+    <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hide transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform">
+            <h3 id="modalTitle" class="text-lg font-bold mb-2 text-gray-900">Notifikasi</h3>
+            <p id="modalMessage" class="text-gray-600 mb-6 text-sm"></p>
+            <button onclick="closeModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition-colors">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-green-800 text-white shadow-md relative z-10">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <img id="headerLogo" src="https://placehold.co/100x100/16a34a/ffffff?text=NU" alt="Logo" class="w-12 h-12 rounded-full object-cover border-2 border-white">
+                <div>
+                    <h1 class="text-xl font-bold">Asesmen Sumatif Bahasa Inggris</h1>
+                    <p class="text-xs text-green-200">Kelas XII MA Mu'allimin NU | Disusun oleh: Annas Th.</p>
+                </div>
+            </div>
+            <div id="headerUserInfo" class="mt-4 md:mt-0 text-sm font-medium hide flex items-center gap-4">
+                <span id="headerUserName" class="bg-green-900 px-3 py-1 rounded-full"></span>
+                <button onclick="logout()" class="text-white hover:text-red-300 underline text-xs">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl mx-auto w-full p-4 relative">
+        
+        <!-- LOGIN SECTION -->
+        <section id="loginSection" class="glass-panel max-w-md mx-auto mt-10 rounded-2xl shadow-xl overflow-hidden fade-in">
+            <div class="flex border-b">
+                <button id="tabStudent" onclick="switchLoginTab('student')" class="w-1/2 py-4 text-center font-semibold text-green-700 border-b-2 border-green-700 bg-green-50 transition-colors">Login Siswa</button>
+                <button id="tabAdmin" onclick="switchLoginTab('admin')" class="w-1/2 py-4 text-center font-semibold text-gray-500 border-b-2 border-transparent hover:bg-gray-50 transition-colors">Login Admin</button>
+            </div>
+            <div class="p-6">
+                <!-- Student Login Form -->
+                <form id="studentLoginForm" onsubmit="handleStudentLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="loginName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                        <select id="loginClass" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                            <option value="">Pilih Kelas</option>
+                            <option value="XII IPA 1">XII IPA 1</option>
+                            <option value="XII IPA 2">XII IPA 2</option>
+                            <option value="XII IPS 1">XII IPS 1</option>
+                            <option value="XII IPS 2">XII IPS 2</option>
+                            <option value="XII Agama">XII Agama</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Presensi (Password)</label>
+                        <input type="number" id="loginPresensi" required min="1" max="50" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none" placeholder="Contoh: 12">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Masuk sebagai Siswa</button>
+                </form>
+
+                <!-- Admin Login Form -->
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-4 hide">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username Admin</label>
+                        <input type="text" id="adminUsername" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Username default: admin">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="adminPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Password default: admin">
+                    </div>
+                    <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-lg transition-colors">Masuk Dashboard Admin</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ADMIN DASHBOARD -->
+        <section id="adminDashboard" class="hide fade-in">
+            <div class="glass-panel p-6 rounded-2xl shadow-lg mb-6">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">Dashboard Administrator</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button onclick="toggleAdminPanel('editSoal')" class="p-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-left transition-colors">
+                        <h3 class="font-bold text-blue-800">Edit Soal & Jawaban</h3>
+                        <p class="text-xs text-blue-600 mt-1">Modifikasi 40 daftar pertanyaan</p>
+                    </button>
+                    <button onclick="toggleAdminPanel('editLogo')" class="p-4 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-left transition-colors">
+                        <h3 class="font-bold text-purple-800">Edit Logo</h3>
+                        <p class="text-xs text-purple-600 mt-1">Ubah logo madrasah</p>
+                    </button>
+                    <button onclick="toggleAdminPanel('editPassword')" class="p-4 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-left transition-colors">
+                        <h3 class="font-bold text-orange-800">Ganti Password</h3>
+                        <p class="text-xs text-orange-600 mt-1">Perbarui akses admin</p>
+                    </button>
+                    <button onclick="startExam(true)" class="p-4 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl text-left transition-colors">
+                        <h3 class="font-bold text-green-800">Uji Coba Ujian</h3>
+                        <p class="text-xs text-green-600 mt-1">Simulasi pengerjaan siswa</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Sub-panels -->
+            <div id="panelEditLogo" class="glass-panel p-6 rounded-2xl shadow-lg mb-6 hide">
+                <h3 class="font-bold text-lg mb-3">Ubah Logo</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="newLogoUrl" placeholder="URL Gambar Logo" class="flex-grow px-4 py-2 border rounded-lg">
+                    <button onclick="saveLogo()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan</button>
+                </div>
+            </div>
+
+            <div id="panelEditPassword" class="glass-panel p-6 rounded-2xl shadow-lg mb-6 hide">
+                <h3 class="font-bold text-lg mb-3">Ganti Password Admin</h3>
+                <div class="flex gap-2">
+                    <input type="password" id="newAdminPassword" placeholder="Password Baru" class="flex-grow px-4 py-2 border rounded-lg">
+                    <button onclick="saveAdminPassword()" class="bg-orange-600 text-white px-4 py-2 rounded-lg">Simpan</button>
+                </div>
+            </div>
+
+            <div id="panelEditSoal" class="glass-panel p-6 rounded-2xl shadow-lg mb-6 hide">
+                <h3 class="font-bold text-lg mb-3">Editor Soal (Basis Data Internal)</h3>
+                <p class="text-sm text-gray-600 mb-4">Pilih soal untuk diedit teksnya. Pastikan tidak mengubah format terlalu drastis.</p>
+                <div class="max-h-96 overflow-y-auto border rounded-lg p-2 bg-gray-50" id="questionEditorList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENT DASHBOARD -->
+        <section id="studentDashboard" class="hide fade-in">
+            <div class="glass-panel p-8 rounded-2xl shadow-lg max-w-2xl mx-auto text-center mt-10">
+                <h2 class="text-3xl font-bold mb-2 text-green-800">Selamat Datang, <span id="dashStudentName"></span></h2>
+                <p class="text-gray-600 mb-6">Kelas <span id="dashStudentClass" class="font-semibold"></span> | Presensi: <span id="dashStudentPresensi" class="font-semibold"></span></p>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left text-sm text-blue-800">
+                    <h4 class="font-bold mb-1">Informasi Ujian (Bahasa Inggris):</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Materi: <strong>Narrative Text (The Story of a Friendly Future)</strong></li>
+                        <li>Waktu Ujian: <strong>90 Menit</strong></li>
+                        <li>KKM (Kriteria Ketuntasan Minimal): <strong>78</strong></li>
+                        <li>Jumlah Soal: 40 (20 PG, 10 PG Kompleks, 10 Menjodohkan)</li>
+                        <li>Kesempatan Mengerjakan: <strong>Maksimal 2 kali</strong></li>
+                        <li>Sisa kesempatan Anda: <span id="dashAttempts" class="font-bold text-lg text-red-600"></span> kali</li>
+                    </ul>
+                </div>
+                
+                <button id="btnStartExam" onclick="startExam(false)" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                    Mulai Kerjakan
+                </button>
+                <p id="msgNoAttempts" class="text-red-600 font-bold mt-4 hide">Anda telah kehabisan kesempatan mengerjakan ujian ini.</p>
+            </div>
+        </section>
+
+        <!-- EXAM AREA -->
+        <section id="examSection" class="hide fade-in pb-20">
+            <!-- Sticky Timer & Progress -->
+            <div class="sticky top-0 z-40 bg-white/95 backdrop-blur shadow-sm p-4 rounded-xl mb-6 flex justify-between items-center border border-green-100">
+                <div class="text-sm font-medium text-gray-600">
+                    Siswa: <span id="examStudentName" class="font-bold text-gray-800"></span> (<span id="examStudentClass"></span>)
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Sisa Waktu</div>
+                        <div id="examTimer" class="text-2xl font-bold text-green-700 font-mono">90:00</div>
+                    </div>
+                    <button onclick="confirmSubmit()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        Selesai & Kumpulkan
+                    </button>
+                </div>
+            </div>
+
+            <div id="questionsContainer" class="space-y-6">
+                <!-- Questions injected here by JS -->
+            </div>
+        </section>
+
+        <!-- RESULT SECTION -->
+        <section id="resultSection" class="hide fade-in mt-10">
+            <div class="glass-panel p-8 rounded-2xl shadow-xl max-w-2xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-6 text-gray-800">Hasil Asesmen Sumatif</h2>
+                <div class="w-40 h-40 mx-auto rounded-full flex items-center justify-center text-5xl font-bold mb-4 shadow-inner" id="scoreCircle">
+                    <!-- Score here -->
+                </div>
+                <h3 id="resultStatus" class="text-2xl font-bold mb-2"></h3>
+                <p id="resultMessage" class="text-gray-600 mb-8"></p>
+                
+                <div class="flex gap-4 justify-center">
+                    <button onclick="downloadResult()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Download PDF/TXT
+                    </button>
+                    <button onclick="returnToDashboard()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors">
+                        Kembali ke Beranda
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let appState = {
+            admin: { username: 'admin', password: 'admin' },
+            logoUrl: 'https://placehold.co/100x100/16a34a/ffffff?text=NU',
+            students: {}, // Key: presensi, Value: obj
+            currentUser: null,
+            timerInterval: null,
+            timeRemaining: 90 * 60, // 90 minutes in seconds
+            examActive: false,
+            kkm: 78,
+            maxAttempts: 2
+        };
+
+        // MATCHING OPTIONS POOL (10 Future Narrative Concepts)
+        const matchingOptions = [
+            "Select a concept...",
+            "Orientation",
+            "Complication",
+            "Resolution",
+            "Utopia",
+            "Terraforming",
+            "Artificial Intelligence",
+            "Cosmic Storm",
+            "Moral Value",
+            "Action Verb",
+            "Time Connective"
+        ];
+
+        let questions = [
+            // --- SOAL PG (20) ---
+            { id: 1, type: 'pg', text: '<div class="story-box">In the year 2150, humans and AI lived in perfect harmony. Elara, a young engineer, had a robotic dog named Spark. One day, the city\'s central energy core malfunctioned, causing a blackout. Instead of panicking, the community gathered. Spark used his micro-welders to fix the core\'s circuitry while Elara guided him. The city lit up again, brighter than before, showing that collaboration between organics and synthetics was their greatest strength.</div>What is the main complication in the story?', options: ['A. Elara bought a new robotic dog', 'B. The community gathered in the dark', 'C. The city\'s central energy core malfunctioned', 'D. Humans and AI lived in perfect harmony'], answer: 2 },
+            { id: 2, type: 'pg', text: 'Who is Spark in the story above?', options: ['A. A young human engineer', 'B. Elara\'s robotic dog', 'C. The mayor of the city', 'D. A central energy core'], answer: 1 },
+            { id: 3, type: 'pg', text: 'How was the problem solved in the narrative text?', options: ['A. Elara and Spark worked together to fix the circuitry', 'B. The community left the city', 'C. They waited for the sun to come up', 'D. Spark replaced the whole core with a new one'], answer: 0 },
+            { id: 4, type: 'pg', text: 'What is the moral value we can learn from Elara and Spark\'s story?', options: ['A. Robots are dangerous and should be avoided', 'B. Blackouts are a normal part of the future', 'C. Dogs are better than robots', 'D. Collaboration between different beings brings great strength'], answer: 3 },
+            { id: 5, type: 'pg', text: '"The city lit up again, brighter than <u>before</u>..." The underlined word refers to the time...', options: ['A. After the blackout was fixed', 'B. When Elara was born', 'C. Prior to the central energy core malfunctioning', 'D. During the community gathering'], answer: 2 },
+            
+            { id: 6, type: 'pg', text: '<div class="story-box">Leo lived in Aero-City, a floating utopia above the clouds. Below, the Earth was healing itself through automated terraforming machines. Leo\'s best friend was Maya, a girl from the Surface Restoration Team. Maya sent Leo a real, organic apple—a rare gift. When Leo bit into it, he tasted the sun and soil. Inspired, he decided he wanted to join Maya\'s team to help rebuild the Earth, leaving his comfortable floating life behind.</div>Where does Leo live at the beginning of the story?', options: ['A. On the healing Earth', 'B. In an underground bunker', 'C. In Aero-City, a floating utopia', 'D. In a spaceship heading to Mars'], answer: 2 },
+            { id: 7, type: 'pg', text: 'What special gift did Maya send to Leo?', options: ['A. A new terraforming machine', 'B. A real, organic apple', 'C. A ticket to the Surface Restoration Team', 'D. A jar of soil'], answer: 1 },
+            { id: 8, type: 'pg', text: 'Why did Leo decide to leave his comfortable life in Aero-City?', options: ['A. Because Aero-City was falling down', 'B. Because he was banished by the mayor', 'C. Because he tasted the apple and wanted to help rebuild the Earth', 'D. Because he hated the clouds'], answer: 2 },
+            { id: 9, type: 'pg', text: 'Based on the generic structure of a narrative text, the sentence "Leo lived in Aero-City, a floating utopia above the clouds" belongs to...', options: ['A. Resolution', 'B. Complication', 'C. Re-orientation', 'D. Orientation'], answer: 3 },
+            { id: 10, type: 'pg', text: '"...leaving his comfortable floating life <u>behind</u>." What does the phrase mean?', options: ['A. Bringing his comfortable life with him', 'B. Abandoning his current lifestyle for a new one', 'C. Hiding his floating life from Maya', 'D. Destroying Aero-City completely'], answer: 1 },
+
+            { id: 11, type: 'pg', text: '<div class="story-box">Aboard the starship Harmony, humans and aliens traveled together to find a new galaxy. Zara, a human pilot, often argued with Xylar, the alien navigator, about which route to take. One day, they encountered a dangerous cosmic storm. Xylar\'s species could see magnetic fields, while Zara had exceptionally quick reflexes. By combining their unique abilities, they navigated safely through the storm. They realized that their differences were exactly what saved them.</div>Where does the story take place?', options: ['A. Aboard the starship Harmony', 'B. On planet Earth', 'C. Inside a magnetic field', 'D. In a space station'], answer: 0 },
+            { id: 12, type: 'pg', text: 'Why did Zara and Xylar often argue before the storm?', options: ['A. They didn\'t like each other\'s food', 'B. They disagreed about which route to take', 'C. Xylar wanted to pilot the ship', 'D. Zara wanted to return to Earth'], answer: 1 },
+            { id: 13, type: 'pg', text: 'What special ability did Xylar have?', options: ['A. Exceptional reflexes', 'B. The ability to breathe in space', 'C. The ability to see magnetic fields', 'D. The ability to control the storm'], answer: 2 },
+            { id: 14, type: 'pg', text: 'How is the complication resolved in the story?', options: ['A. They activated the autopilot', 'B. Zara navigated alone using her reflexes', 'C. They combined their unique abilities to navigate safely', 'D. They called for help from another starship'], answer: 2 },
+            { id: 15, type: 'pg', text: 'What realization did Zara and Xylar have at the end of the narrative?', options: ['A. That humans are better pilots', 'B. That aliens should always navigate', 'C. That cosmic storms are not dangerous', 'D. That their differences were what saved them'], answer: 3 },
+
+            { id: 16, type: 'pg', text: '<div class="story-box">In a quiet town of the future, a robot named Orion was designed to sing. However, his voice chip was damaged, making a rough, metallic sound. The townspeople didn\'t mind; they found his unique voice charming. During the annual Unity Festival, the main speaker system broke. Orion stepped up and sang his metallic song. To everyone\'s surprise, the frequency of his voice resonated with the town\'s dormant crystal power source, activating a beautiful light show.</div>What was Orion\'s original purpose?', options: ['A. To clean the town', 'B. To sing', 'C. To fix speaker systems', 'D. To power the town\'s crystals'], answer: 1 },
+            { id: 17, type: 'pg', text: 'What was considered the "flaw" or complication regarding Orion?', options: ['A. He was too loud', 'B. His voice chip was damaged, producing a metallic sound', 'C. He refused to sing at the festival', 'D. The townspeople hated him'], answer: 1 },
+            { id: 18, type: 'pg', text: 'How did the townspeople feel about Orion\'s damaged voice?', options: ['A. They found it charming and unique', 'B. They wanted to dismantle him', 'C. They covered their ears when he sang', 'D. They ignored him completely'], answer: 0 },
+            { id: 19, type: 'pg', text: 'What major event occurred during the Unity Festival?', options: ['A. The crystal power source exploded', 'B. The main speaker system broke down', 'C. Orion lost his voice completely', 'D. A cosmic storm hit the town'], answer: 1 },
+            { id: 20, type: 'pg', text: 'What was the unexpected, positive resolution of Orion singing at the festival?', options: ['A. The speaker system fixed itself', 'B. His voice activated a beautiful crystal light show', 'C. He got a brand new voice chip', 'D. The townspeople fell asleep'], answer: 1 },
+
+            // --- STREAMING_CHUNK:Building Complex Multiple Choice Data... ---
+            // --- SOAL PG KOMPLEKS (10) - Pilihan benar lebih dari satu ---
+            { id: 21, type: 'complex', text: 'From the story of Elara and Spark (Text 1), which of the following statements are TRUE? (Choose 2 correct answers)', options: ['A. The story takes place in the past', 'B. Spark is an organic dog', 'C. Elara is a young engineer', 'D. Collaboration between humans and AI is shown as a strength'], answer: [2, 3] },
+            { id: 22, type: 'complex', text: 'In a narrative text, what are the typical elements found in the "Orientation" paragraph? (Choose 2 correct answers)', options: ['A. Introduction of the main conflict/problem', 'B. Introduction of the characters', 'C. The moral value of the story', 'D. Setting of time and place'], answer: [1, 3] },
+            { id: 23, type: 'complex', text: 'Based on Text 2 (Leo and Maya), what were the characteristics of the world they lived in? (Choose 2 correct answers)', options: ['A. Earth was completely destroyed and abandoned forever', 'B. Aero-City was a floating utopia above the clouds', 'C. Earth was being healed by automated terraforming machines', 'D. Apples were very common in Aero-City'], answer: [1, 2] },
+            { id: 24, type: 'complex', text: 'Narrative texts frequently use action verbs (Dynamic verbs). Which of the following words from the texts are action verbs? (Choose 2 correct answers)', options: ['A. Beautiful', 'B. Gathered', 'C. Repaired', 'D. Future'], answer: [1, 2] },
+            { id: 25, type: 'complex', text: 'What positive themes (moral values) can we identify from Zara and Xylar\'s story aboard the starship Harmony? (Choose 2 correct answers)', options: ['A. Teamwork is essential in a crisis', 'B. Arguing always leads to destruction', 'C. Embracing differences can lead to survival', 'D. Aliens are dangerous'], answer: [0, 2] },
+            { id: 26, type: 'complex', text: 'Which of these adjectives were used to describe Orion\'s voice and the townspeople\'s reaction in Text 4? (Choose 2 correct answers)', options: ['A. Terrifying', 'B. Metallic', 'C. Charming', 'D. Perfect'], answer: [1, 2] },
+            { id: 27, type: 'complex', text: 'A "friendly future" narrative text often contains which of the following elements? (Choose 2 correct answers)', options: ['A. Apocalyptic destruction with no hope', 'B. Harmonious relationship between humans and technology', 'C. Solutions based on collaboration and empathy', 'D. Endless wars between galaxies'], answer: [1, 2] },
+            { id: 28, type: 'complex', text: 'Which sentences show the "complication" (problem) in the provided futuristic stories? (Choose 2 correct answers)', options: ['A. The city\'s central energy core malfunctioned.', 'B. Leo lived in Aero-City, a floating utopia.', 'C. They encountered a dangerous cosmic storm.', 'D. The city lit up again, brighter than before.'], answer: [0, 2] },
+            { id: 29, type: 'complex', text: 'In the provided futuristic narratives, AI and robots (like Spark and Orion) are portrayed as... (Choose 2 correct answers)', options: ['A. Helpful companions', 'B. Enemies of humanity', 'C. Beings capable of contributing positively', 'D. Emotionless killers'], answer: [0, 2] },
+            { id: 30, type: 'complex', text: 'What generic structures must be present for a story to be classified as a Narrative Text? (Choose 2 correct answers)', options: ['A. General Classification', 'B. Orientation', 'C. Complication', 'D. Argumentation'], answer: [1, 2] },
+
+            // --- STREAMING_CHUNK:Building Matching Data... ---
+            // --- SOAL MENJODOHKAN (10) ---
+            { id: 31, type: 'match', text: 'The part of a narrative text that introduces the characters, setting of time, and place.', answer: 1 }, // Orientation
+            { id: 32, type: 'match', text: 'The part of a narrative text where the problem is finally solved, for better or worse.', answer: 3 }, // Resolution
+            { id: 33, type: 'match', text: 'The part of the story where a crisis or problem arises among the characters.', answer: 2 }, // Complication
+            { id: 34, type: 'match', text: 'An imagined futuristic place or state of things in which everything is perfect (like Aero-City).', answer: 4 }, // Utopia
+            { id: 35, type: 'match', text: 'The lesson, message, or advice that the author wants to convey through the narrative.', answer: 8 }, // Moral Value
+            { id: 36, type: 'match', text: 'The process of transforming a planet to resemble the Earth, making it habitable again.', answer: 5 }, // Terraforming
+            { id: 37, type: 'match', text: 'A dangerous space phenomenon encountered by Zara and Xylar aboard the starship.', answer: 7 }, // Cosmic Storm
+            { id: 38, type: 'match', text: 'Words like "jumped", "flew", "fixed", and "sang" that show physical activities in a story.', answer: 9 }, // Action Verb
+            { id: 39, type: 'match', text: 'A machine or system with the ability to reason or learn (often featured in friendly future stories).', answer: 6 }, // Artificial Intelligence
+            { id: 40, type: 'match', text: 'Words like "One day", "Suddenly", and "Then" used to sequence events in a narrative text.', answer: 10 }  // Time Connective
+        ];
+
+        // --- STREAMING_CHUNK:Core Application Logic... ---
+        window.onload = () => {
+            document.getElementById('headerLogo').src = appState.logoUrl;
+            console.log("App initialized in-memory. Students list empty on load.");
+        };
+
+        function showModal(title, message) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            const modal = document.getElementById('customModal');
+            modal.classList.remove('hide');
+            setTimeout(() => { modal.classList.add('opacity-100'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customModal');
+            modal.classList.add('hide');
+        }
+
+        function switchLoginTab(tab) {
+            if (tab === 'student') {
+                document.getElementById('studentLoginForm').classList.remove('hide');
+                document.getElementById('adminLoginForm').classList.add('hide');
+                document.getElementById('tabStudent').classList.add('text-green-700', 'border-green-700', 'bg-green-50');
+                document.getElementById('tabStudent').classList.remove('text-gray-500', 'border-transparent', 'hover:bg-gray-50');
+                document.getElementById('tabAdmin').classList.remove('text-green-700', 'border-green-700', 'bg-green-50');
+                document.getElementById('tabAdmin').classList.add('text-gray-500', 'border-transparent', 'hover:bg-gray-50');
+            } else {
+                document.getElementById('adminLoginForm').classList.remove('hide');
+                document.getElementById('studentLoginForm').classList.add('hide');
+                document.getElementById('tabAdmin').classList.add('text-green-700', 'border-green-700', 'bg-green-50');
+                document.getElementById('tabAdmin').classList.remove('text-gray-500', 'border-transparent', 'hover:bg-gray-50');
+                document.getElementById('tabStudent').classList.remove('text-green-700', 'border-green-700', 'bg-green-50');
+                document.getElementById('tabStudent').classList.add('text-gray-500', 'border-transparent', 'hover:bg-gray-50');
+            }
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('loginName').value.trim();
+            const cls = document.getElementById('loginClass').value;
+            const presensi = document.getElementById('loginPresensi').value;
+
+            if (!name || !cls || !presensi) {
+                showModal('Peringatan', 'Harap isi semua data dengan lengkap.');
+                return;
+            }
+
+            if (!appState.students[presensi]) {
+                appState.students[presensi] = { name, class: cls, presensi, attempts: 0, latestScore: 0 };
+            } else {
+                const s = appState.students[presensi];
+                if (s.name.toLowerCase() !== name.toLowerCase() || s.class !== cls) {
+                    showModal('Akses Ditolak', 'Nomor presensi ini sudah digunakan oleh siswa lain dengan nama/kelas berbeda. Hubungi Admin.');
+                    return;
+                }
+            }
+
+            appState.currentUser = { role: 'student', ...appState.students[presensi] };
+            loginSuccess();
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminUsername').value;
+            const pass = document.getElementById('adminPassword').value;
+
+            if (user === appState.admin.username && pass === appState.admin.password) {
+                appState.currentUser = { role: 'admin', name: 'Administrator' };
+                loginSuccess();
+            } else {
+                showModal('Gagal Login', 'Username atau Password Admin salah.');
+            }
+        }
+
+        function loginSuccess() {
+            document.getElementById('loginSection').classList.add('hide');
+            document.getElementById('headerUserInfo').classList.remove('hide');
+            document.getElementById('headerUserName').innerText = appState.currentUser.name;
+
+            if (appState.currentUser.role === 'admin') {
+                document.getElementById('adminDashboard').classList.remove('hide');
+                populateQuestionEditor();
+            } else {
+                document.getElementById('studentDashboard').classList.remove('hide');
+                document.getElementById('dashStudentName').innerText = appState.currentUser.name;
+                document.getElementById('dashStudentClass').innerText = appState.currentUser.class;
+                document.getElementById('dashStudentPresensi').innerText = appState.currentUser.presensi;
+                
+                const attemptsLeft = appState.maxAttempts - appState.currentUser.attempts;
+                document.getElementById('dashAttempts').innerText = attemptsLeft;
+                
+                if (attemptsLeft <= 0) {
+                    document.getElementById('btnStartExam').classList.add('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('btnStartExam').disabled = true;
+                    document.getElementById('msgNoAttempts').classList.remove('hide');
+                } else {
+                    document.getElementById('btnStartExam').classList.remove('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('btnStartExam').disabled = false;
+                    document.getElementById('msgNoAttempts').classList.add('hide');
+                }
+            }
+        }
+
+        function logout() {
+            if (appState.examActive) {
+                showModal('Aksi Ditolak', 'Anda sedang mengerjakan ujian. Selesaikan atau kumpulkan ujian terlebih dahulu.');
+                return;
+            }
+            appState.currentUser = null;
+            
+            document.getElementById('headerUserInfo').classList.add('hide');
+            document.getElementById('adminDashboard').classList.add('hide');
+            document.getElementById('studentDashboard').classList.add('hide');
+            document.getElementById('examSection').classList.add('hide');
+            document.getElementById('resultSection').classList.add('hide');
+            
+            document.getElementById('loginSection').classList.remove('hide');
+            document.getElementById('studentLoginForm').reset();
+            document.getElementById('adminLoginForm').reset();
+        }
+
+        // --- STREAMING_CHUNK:Admin Functions... ---
+        function toggleAdminPanel(panelId) {
+            ['panelEditSoal', 'panelEditLogo', 'panelEditPassword'].forEach(id => {
+                const el = document.getElementById(id);
+                if (id === 'panel' + panelId.charAt(0).toUpperCase() + panelId.slice(1)) {
+                    el.classList.toggle('hide');
+                } else {
+                    el.classList.add('hide');
+                }
+            });
+        }
+
+        function saveLogo() {
+            const url = document.getElementById('newLogoUrl').value.trim();
+            if (url) {
+                appState.logoUrl = url;
+                document.getElementById('headerLogo').src = url;
+                showModal('Sukses', 'Logo berhasil diperbarui.');
+                document.getElementById('newLogoUrl').value = '';
+            }
+        }
+
+        function saveAdminPassword() {
+            const pwd = document.getElementById('newAdminPassword').value.trim();
+            if (pwd) {
+                appState.admin.password = pwd;
+                showModal('Sukses', 'Password Admin berhasil diperbarui.');
+                document.getElementById('newAdminPassword').value = '';
+            }
+        }
+
+        function populateQuestionEditor() {
+            const container = document.getElementById('questionEditorList');
+            container.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = 'p-3 mb-2 bg-white border rounded shadow-sm';
+                div.innerHTML = `
+                    <div class="font-bold text-sm text-gray-700">Soal ${idx + 1} (${q.type})</div>
+                    <textarea class="w-full text-sm p-2 border rounded mt-1 outline-none focus:border-blue-500" rows="3" onchange="updateQuestionText(${idx}, this.value)">${q.text}</textarea>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateQuestionText(idx, newText) {
+            questions[idx].text = newText;
+        }
+
+        // --- STREAMING_CHUNK:Exam Engine & Rendering... ---
+        function startExam(isAdminTest = false) {
+            if (!isAdminTest) {
+                if (appState.currentUser.attempts >= appState.maxAttempts) {
+                    showModal('Akses Ditolak', 'Kesempatan mengerjakan sudah habis.');
+                    return;
+                }
+                appState.currentUser.attempts++;
+                appState.students[appState.currentUser.presensi].attempts = appState.currentUser.attempts;
+            }
+
+            document.getElementById('adminDashboard').classList.add('hide');
+            document.getElementById('studentDashboard').classList.add('hide');
+            document.getElementById('examSection').classList.remove('hide');
+            
+            document.getElementById('examStudentName').innerText = appState.currentUser.name + (isAdminTest ? ' (Uji Coba Admin)' : '');
+            document.getElementById('examStudentClass').innerText = appState.currentUser.class || 'Admin';
+
+            appState.examActive = true;
+            appState.timeRemaining = 90 * 60; // reset to 90 min
+            renderQuestions();
+            startTimer();
+            window.scrollTo(0,0);
+        }
+
+        function startTimer() {
+            clearInterval(appState.timerInterval);
+            updateTimerUI();
+            appState.timerInterval = setInterval(() => {
+                appState.timeRemaining--;
+                updateTimerUI();
+                if (appState.timeRemaining <= 0) {
+                    clearInterval(appState.timerInterval);
+                    autoSubmit();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const m = Math.floor(appState.timeRemaining / 60).toString().padStart(2, '0');
+            const s = (appState.timeRemaining % 60).toString().padStart(2, '0');
+            const el = document.getElementById('examTimer');
+            el.innerText = `${m}:${s}`;
+            
+            if (appState.timeRemaining < 300) { 
+                el.classList.add('text-red-600');
+                el.classList.remove('text-green-700');
+            } else {
+                el.classList.remove('text-red-600');
+                el.classList.add('text-green-700');
+            }
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            container.appendChild(createSectionHeader('Part I: Multiple Choice (Choose one correct answer)', 'bg-blue-50 text-blue-800 border-blue-200'));
+            questions.filter(q => q.type === 'pg').forEach((q, i) => container.appendChild(renderPG(q, i + 1)));
+            
+            container.appendChild(createSectionHeader('Part II: Complex Multiple Choice (Choose 2 or more correct answers)', 'bg-purple-50 text-purple-800 border-purple-200'));
+            questions.filter(q => q.type === 'complex').forEach((q, i) => container.appendChild(renderComplex(q, i + 21)));
+            
+            container.appendChild(createSectionHeader('Part III: Matching (Select the correct concept from the dropdown)', 'bg-orange-50 text-orange-800 border-orange-200'));
+            questions.filter(q => q.type === 'match').forEach((q, i) => container.appendChild(renderMatch(q, i + 31)));
+        }
+
+        function createSectionHeader(title, colorClasses) {
+            const div = document.createElement('div');
+            div.className = `p-4 rounded-lg border font-bold text-lg mb-4 mt-8 ${colorClasses}`;
+            div.innerText = title;
+            return div;
+        }
+
+        function renderPG(q, displayNum) {
+            const div = document.createElement('div');
+            div.className = 'glass-panel p-6 rounded-xl shadow-sm border border-gray-100 mb-4';
+            div.innerHTML = `
+                <div class="flex gap-4">
+                    <div class="font-bold text-lg text-green-700">${displayNum}.</div>
+                    <div class="flex-grow">
+                        <div class="text-gray-800 mb-4 leading-relaxed">${q.text}</div>
+                        <div class="space-y-2">
+                            ${q.options.map((opt, optIdx) => `
+                                <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-green-50 cursor-pointer border border-transparent hover:border-green-100 transition-colors">
+                                    <input type="radio" name="q_${q.id}" value="${optIdx}" class="mt-1 w-4 h-4 text-green-600 focus:ring-green-500">
+                                    <span class="text-gray-700">${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        function renderComplex(q, displayNum) {
+            const div = document.createElement('div');
+            div.className = 'glass-panel p-6 rounded-xl shadow-sm border border-gray-100 mb-4';
+            div.innerHTML = `
+                <div class="flex gap-4">
+                    <div class="font-bold text-lg text-purple-700">${displayNum}.</div>
+                    <div class="flex-grow">
+                        <div class="text-gray-800 mb-4 leading-relaxed">${q.text}</div>
+                        <div class="space-y-2">
+                            ${q.options.map((opt, optIdx) => `
+                                <label class="flex items-start gap-3 p-3 rounded-lg hover:bg-purple-50 cursor-pointer border border-transparent hover:border-purple-100 transition-colors">
+                                    <input type="checkbox" name="q_${q.id}[]" value="${optIdx}" class="mt-1 w-4 h-4 rounded text-purple-600 focus:ring-purple-500">
+                                    <span class="text-gray-700">${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        function renderMatch(q, displayNum) {
+            const div = document.createElement('div');
+            div.className = 'glass-panel p-6 rounded-xl shadow-sm border border-gray-100 mb-4 flex gap-4 items-center';
+            
+            const optionsHTML = matchingOptions.map((opt, idx) => `<option value="${idx}">${opt}</option>`).join('');
+
+            div.innerHTML = `
+                <div class="font-bold text-lg text-orange-700 self-start">${displayNum}.</div>
+                <div class="flex-grow flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="text-gray-800 leading-relaxed md:w-2/3">${q.text}</div>
+                    <select name="q_${q.id}" class="md:w-1/3 p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                        ${optionsHTML}
+                    </select>
+                </div>
+            `;
+            return div;
+        }
+
+        // --- STREAMING_CHUNK:Grading and Result Logic... ---
+        function confirmSubmit() {
+            const btn = document.querySelector('button[onclick="confirmSubmit()"]');
+            if (btn.innerText === "Selesai & Kumpulkan") {
+                btn.innerText = "Yakin? Klik Lagi";
+                btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                setTimeout(() => {
+                    btn.innerText = "Selesai & Kumpulkan";
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                }, 3000);
+            } else {
+                calculateScore();
+            }
+        }
+
+        function autoSubmit() {
+            showModal('Waktu Habis', 'Waktu pengerjaan telah usai. Jawaban otomatis dikumpulkan.');
+            calculateScore();
+        }
+
+        function calculateScore() {
+            clearInterval(appState.timerInterval);
+            appState.examActive = false;
+            
+            let totalScore = 0;
+
+            // Grade PG (20 x 2.5 = 50)
+            questions.filter(q => q.type === 'pg').forEach(q => {
+                const el = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (el && parseInt(el.value) === q.answer) {
+                    totalScore += 2.5;
+                }
+            });
+
+            // Grade Complex (10 x 3 = 30) - Must be exactly correct
+            questions.filter(q => q.type === 'complex').forEach(q => {
+                const els = document.querySelectorAll(`input[name="q_${q.id}[]"]:checked`);
+                const userVals = Array.from(els).map(el => parseInt(el.value)).sort();
+                const correctVals = [...q.answer].sort();
+                
+                if (JSON.stringify(userVals) === JSON.stringify(correctVals)) {
+                    totalScore += 3;
+                }
+            });
+
+            // Grade Match (10 x 2 = 20)
+            questions.filter(q => q.type === 'match').forEach(q => {
+                const el = document.querySelector(`select[name="q_${q.id}"]`);
+                if (el && parseInt(el.value) === q.answer) {
+                    totalScore += 2;
+                }
+            });
+
+            totalScore = Math.round(totalScore);
+            
+            if (appState.currentUser.role === 'student') {
+                appState.students[appState.currentUser.presensi].latestScore = totalScore;
+                appState.currentUser.latestScore = totalScore;
+            }
+
+            displayResult(totalScore);
+        }
+
+        function displayResult(score) {
+            document.getElementById('examSection').classList.add('hide');
+            document.getElementById('resultSection').classList.remove('hide');
+            window.scrollTo(0,0);
+
+            const circle = document.getElementById('scoreCircle');
+            circle.innerText = score;
+            
+            const status = document.getElementById('resultStatus');
+            const msg = document.getElementById('resultMessage');
+
+            if (score >= appState.kkm) {
+                circle.className = "w-40 h-40 mx-auto rounded-full flex items-center justify-center text-5xl font-bold mb-4 shadow-inner bg-green-100 text-green-700 border-4 border-green-500";
+                status.innerText = "PASSED / TUNTAS";
+                status.className = "text-2xl font-bold mb-2 text-green-700";
+                msg.innerText = "Congratulations! You have passed the minimum requirement (KKM: 78).";
+            } else {
+                circle.className = "w-40 h-40 mx-auto rounded-full flex items-center justify-center text-5xl font-bold mb-4 shadow-inner bg-red-100 text-red-700 border-4 border-red-500";
+                status.innerText = "NOT PASSED / BELUM TUNTAS";
+                status.className = "text-2xl font-bold mb-2 text-red-700";
+                msg.innerText = "Don't give up. Your score is still below the minimum requirement (KKM: 78).";
+            }
+        }
+
+        function returnToDashboard() {
+            document.getElementById('resultSection').classList.add('hide');
+            if (appState.currentUser.role === 'admin') {
+                document.getElementById('adminDashboard').classList.remove('hide');
+            } else {
+                const attemptsLeft = appState.maxAttempts - appState.currentUser.attempts;
+                document.getElementById('dashAttempts').innerText = attemptsLeft;
+                if (attemptsLeft <= 0) {
+                    document.getElementById('btnStartExam').classList.add('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('btnStartExam').disabled = true;
+                    document.getElementById('msgNoAttempts').classList.remove('hide');
+                }
+                document.getElementById('studentDashboard').classList.remove('hide');
+            }
+        }
+
+        function downloadResult() {
+            const score = appState.currentUser.latestScore || 0;
+            const date = new Date().toLocaleString('id-ID');
+            let txtData = `=======================================\n`;
+            txtData += ` ENGLISH SUMMATIVE ASSESSMENT RESULT\n`;
+            txtData += ` MA MU'ALLIMIN NU\n`;
+            txtData += `=======================================\n\n`;
+            txtData += `Full Name     : ${appState.currentUser.name}\n`;
+            txtData += `Class         : ${appState.currentUser.class || '-'}\n`;
+            txtData += `Presensi No.  : ${appState.currentUser.presensi || '-'}\n`;
+            txtData += `Time Finished : ${date}\n\n`;
+            txtData += `FINAL SCORE   : ${score} / 100\n`;
+            txtData += `KKM STATUS    : ${score >= appState.kkm ? 'PASSED' : 'NOT PASSED'} (KKM: 78)\n\n`;
+            txtData += `Prepared by   : Annas Th.\n`;
+            txtData += `=======================================\n`;
+
+            const blob = new Blob([txtData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `English_Result_${appState.currentUser.name.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
